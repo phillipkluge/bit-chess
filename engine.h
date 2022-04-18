@@ -11,6 +11,7 @@ private:
 private:
 	//std::vector<int> generateAllMoves();
 	void generateSlidingMoves(std::vector<int>& moves);
+    void slidingPieceMoves(std::vector<int>& allMoves, Moves::Pieces pieceType, UINT64 pieceBoard, UINT64 friendly, UINT64 enemy, Moves::Pieces frCol, Moves::Pieces enCol);
 	void generatePawnMoves(std::vector<int> &moves);
 	void generateKnightMoves(std::vector<int> &moves);
 	void generateKingMoves(std::vector<int> &moves);
