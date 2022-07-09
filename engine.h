@@ -18,6 +18,7 @@ private:
 	void makeMove(int move);
 	void unmakeMove();
 	void precalculateSlidingAttacks();
+	Moves::Pieces getEnPieceType(int currLoc, Moves::Pieces enCol);
 public:
 	Engine();
 	std::vector<int> generateAllMoves();

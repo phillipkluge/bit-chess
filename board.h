@@ -8,23 +8,16 @@ class Board
 private:
 	void precalculateData();
 public:
-	UINT64 whitePieces;
-	UINT64 blackPieces;
+	UINT64 **pieceBoards;
+	/*
+	           0            1           2           3             4             5           6
+	0 -> {whitePieces, whiteKings, whitePawns, whiteKnights, whiteBishops, whiteRooks, whiteQueens}
+	1 -> {blackPieces, blackKings, blackPawns, blackKnights, blackBishops, blackRooks, blackQueens}
+	
+	*/
+
 	UINT64 occupied;
-
-	UINT64 whitePawns;
-	UINT64 whiteBishops;
-	UINT64 whiteKnights;
-	UINT64 whiteRooks;
-	UINT64 whiteQueens;
-	UINT64 whiteKings;
-
-	UINT64 blackPawns;
-	UINT64 blackBishops;
-	UINT64 blackKnights;
-	UINT64 blackRooks;
-	UINT64 blackQueens;
-	UINT64 blackKings;
+	UINT64 unoccupied;
 
 	static const UINT64 ONE = 1;
 	static const UINT64 ZERO = 0;

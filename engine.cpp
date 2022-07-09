@@ -44,31 +44,31 @@ void Engine::generateSlidingMoves(std::vector<int>& allMoves)
 
 	if (whiteToMove)
 	{
-		bishops = board.whiteBishops;
-		rooks = board.whiteRooks;
-		queens = board.whiteQueens;
+		bishops = board.pieceBoards[0][4];
+		rooks = board.pieceBoards[0][5];
+		queens = board.pieceBoards[0][6];
         
-		friendly = board.whitePieces;
+		friendly = board.pieceBoards[0][0];
 		frCol = Moves::WHITE;
-		enemy = board.blackPieces;
+		enemy = board.pieceBoards[1][0];
 		enCol = Moves::BLACK;
 	}
 	else
 	{
-		bishops = board.blackBishops;
-		rooks = board.whiteRooks;
-		queens = board.blackQueens;
+		bishops = board.pieceBoards[1][4];
+		rooks = board.pieceBoards[1][5];
+		queens = board.pieceBoards[1][6];
         
-		friendly = board.blackPieces;
+		friendly = board.pieceBoards[1][0];
 		frCol = Moves::BLACK;
-		enemy = board.whitePieces;
+		enemy = board.pieceBoards[0][0];
 		enCol = Moves::WHITE;
 	}
     
 	// goes through each of the sliding piece positions and finds valid moves
     slidingPieceMoves(allMoves, Moves::BISHOP, bishops, friendly, enemy, frCol, enCol);
-    slidingPieceMoves(allMoves, Moves::ROOK, rooks, friendly, enemy, frCol, enCol);
-    slidingPieceMoves(allMoves, Moves::QUEEN, queens, friendly, enemy, frCol, enCol);
+    // slidingPieceMoves(allMoves, Moves::ROOK, rooks, friendly, enemy, frCol, enCol);
+    // slidingPieceMoves(allMoves, Moves::QUEEN, queens, friendly, enemy, frCol, enCol);
 }
 
 void Engine::slidingPieceMoves(std::vector<int>& allMoves, Moves::Pieces pieceType, UINT64 pieceBoard, UINT64 friendly, UINT64 enemy, Moves::Pieces frCol, Moves::Pieces enCol)
@@ -98,15 +98,17 @@ void Engine::slidingPieceMoves(std::vector<int>& allMoves, Moves::Pieces pieceTy
                 }
                 else if (enemyInVision & (board.ONE << currLoc))
                 {
+                	Moves::Pieces enPieceType = getEnPieceType(currLoc, enCol);
+
                     // encode the move
-                    currMove = Moves::encodeMove(currLoc, bitOffSet, Moves::NONE, frCol, enCol);
+                    currMove = Moves::encodeMove(currLoc, bitOffSet, Moves::CAPTURES, frCol + pieceType, enCol + enPieceType);
                     allMoves.push_back(currMove);
                     break;
                 }
                 else
                 {
                     // encode the move
-                    currMove = Moves::encodeMove(currLoc, bitOffSet, Moves::NONE, frCol, Moves::NONE);
+                    currMove = Moves::encodeMove(currLoc, bitOffSet, Moves::NONE, frCol + pieceType, Moves::NONE);
                     allMoves.push_back(currMove);
                 }
             }
@@ -128,7 +130,10 @@ void Engine::generateKingMoves(std::vector<int>& moves)
 
 void Engine::makeMove(int move)
 {
-	// TODO: finish makeMove method
+	Moves::outputMove m = Moves::decodeMove(move);
+	UINT64 fromBB = board.ONE << m.stSqr;
+	UINT64 toBB = board.ONE << m.endSqr;
+	UINT64 fromtoBB = fromBB ^ toBB;
 }
 
 void Engine::unmakeMove()
@@ -218,4 +223,22 @@ void Engine::precalculateSlidingAttacks()
 		tempking.push_back(temp);
 	}
 	slidingRayAttacks.push_back(tempking);
+}
+
+Moves::Pieces Engine::getEnPieceType(int currLoc, Moves::Pieces enCol)
+{
+	UINT64 mask = board.ONE << currLoc;
+	UINT64 pawns, bishops, knights, rooks, queens, kings;
+	UINT64 boards[7];
+
+	size_t idx = (enCol == Moves::WHITE) ? 0 : 1;
+
+	for (int i = 1; i < 7; ++i)
+	{
+		if (((board.pieceBoards[idx][i] & mask) >> currLoc) == 1)
+		{
+			return static_cast<Moves::Pieces>(i);
+		}
+	}
+	return Moves::EMPTY;
 }

@@ -19,3 +19,28 @@ int Moves::encodeMove(int endSqr, int stSqr, int flag, int pieceMoved, int piece
 
     return move;
 }
+
+Moves::outputMove Moves::decodeMove(int move)
+{
+    int endSqr, stSqr, flag, pieceMoved, pieceCaptured;
+
+    unsigned mask;
+    mask = (1 << 6) - 1;
+    endSqr = move & mask;
+
+    mask = ((1 << 6) - 1) << 6;
+    stSqr = (move & mask) >> 6;
+
+    mask = ((1 << 4) - 1) << 12;
+    flag = (move & mask) >> 12;
+
+    mask = ((1 << 5) - 1) << 16;
+    pieceMoved = (move & mask) >> 16;
+
+    mask = ((1 << 5) - 1) << 21;
+    pieceCaptured = (move & mask) >> 21;
+
+    outputMove m = { .endSqr = endSqr, .stSqr = stSqr, .flag = flag, .pieceMoved = pieceMoved, .pieceCaptured = pieceCaptured };
+
+    return m;
+}

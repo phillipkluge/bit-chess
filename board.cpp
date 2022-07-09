@@ -3,46 +3,58 @@
 
 Board::Board()
 {
-	// initializing the bitboards
-	whitePieces = 0;
-	blackPieces = 0;
-	occupied = 0;
+	pieceBoards = new UINT64*[2];
 
-	whitePawns = 0;
-	whiteBishops = 0;
-	whiteKnights = 0;
-	whiteRooks = 0;
-	whiteQueens = 0;
-	whiteKings = 0;
-	blackPawns = 0;
-	blackBishops = 0;
-	blackKnights = 0;
-	blackRooks = 0;
-	blackQueens = 0;
-	blackKings = 0;
+	// initializing the bitboards
+	occupied = 0;
+	unoccupied = 0;
+
+	UINT64 whitePieces = 0;
+	UINT64 whiteKings = 0;
+	UINT64 whitePawns = 0;
+	UINT64 whiteKnights = 0;
+	UINT64 whiteBishops = 0;
+	UINT64 whiteRooks = 0;
+	UINT64 whiteQueens = 0;
+
+	UINT64 blackPieces = 0;
+	UINT64 blackKings = 0;
+	UINT64 blackPawns = 0;
+	UINT64 blackKnights = 0;
+	UINT64 blackBishops = 0;
+	UINT64 blackRooks = 0;
+	UINT64 blackQueens = 0;
+
+	// managing the location of the bitboards
+	UINT64 tempWhite[7] = {whitePieces, whiteKings, whitePawns, whiteKnights, whiteBishops, whiteRooks, whiteQueens};
+	UINT64 tempBlack[7]= {blackPieces, blackKings, blackPawns, blackKnights, blackBishops, blackRooks, blackQueens};
+	pieceBoards[0] = tempWhite;
+	pieceBoards[1] = tempBlack;
 
 	// for now, set the board up in a standard way
 	std::string boardArray[8][8] = {
-    /*  {"r", "n", "b", "q", "k", "b", "n", "r"},
-		{"p", "p", "p", "p", "p", "p", "p", "p"},
-		{" ", " ", " ", " ", " ", " ", " ", " "},
-		{" ", " ", " ", " ", " ", " ", " ", " "},
-		{" ", " ", " ", " ", " ", " ", " ", " "},
-		{" ", " ", " ", " ", " ", " ", " ", " "},
-		{"P", "P", "P", "P", "P", "P", "P", "P"},
-		{"R", "N", "B", "Q", "K", "B", "N", "R"} */
+		// {"r", "n", "b", "q", "k", "b", "n", "r"},
+		// {"p", "p", "p", "p", "p", "p", "p", "p"},
+		// {" ", " ", " ", " ", " ", " ", " ", " "},
+		// {" ", " ", " ", " ", " ", " ", " ", " "},
+		// {" ", " ", " ", " ", " ", " ", " ", " "},
+		// {" ", " ", " ", " ", " ", " ", " ", " "},
+		// {"P", "P", "P", "P", "P", "P", "P", "P"},
+		// {"R", "N", "B", "Q", "K", "B", "N", "R"} 
 
 		{" ", " ", " ", " ", " ", " ", " ", " "},
 		{" ", " ", " ", " ", " ", " ", " ", " "},
-		{" ", " ", "p", " ", " ", " ", "R", " "},
 		{" ", " ", " ", " ", " ", " ", " ", " "},
-		{" ", " ", " ", " ", " ", " ", " ", " "},
+		{" ", " ", " ", "p", " ", " ", " ", " "},
+		{" ", " ", " ", " ", "B", " ", " ", " "},
 		{" ", " ", " ", " ", " ", " ", " ", " "},
 		{" ", " ", " ", " ", " ", " ", " ", " "},
 		{" ", " ", " ", " ", " ", " ", " ", " "}
 	};
 	initializeBoardFromArray(boardArray);
 	precalculateData();
+
+	unoccupied = ~occupied;
 }
 
 void Board::initializeBoardFromArray(std::string boardArray[8][8])
@@ -62,56 +74,55 @@ void Board::initializeBoardFromArray(std::string boardArray[8][8])
 			}
 			else if ((isupper(s))) // white pieces
 			{
-				whitePieces |= ONE << position;
+				pieceBoards[0][0] |= ONE << position;
 				occupied |= ONE << position;
 				switch (s)
 				{
-					case 'P':
-						whitePawns |= ONE << position;
+					case 'K':
+						pieceBoards[0][1] |= ONE << position;
 						break;
-					case 'B':
-						whiteBishops |= ONE << position;
+					case 'P':
+						pieceBoards[0][2] |= ONE << position;
 						break;
 					case 'N':
-						whiteKnights |= ONE << position;
+						pieceBoards[0][3] |= ONE << position;
+						break;
+					case 'B':
+						pieceBoards[0][4] |= ONE << position;
 						break;
 					case 'R':
-						whiteRooks |= ONE << position;
+						pieceBoards[0][5] |= ONE << position;
 						break;
 					case 'Q':
-						whiteQueens |= ONE << position;
-						break;
-					case 'K':
-						whiteKings |= ONE << position;
+						pieceBoards[0][6] |= ONE << position;
 						break;
 				}
 			}
 			else // black pieces
 			{
-				blackPieces |= ONE << position;
+				pieceBoards[1][0] |= ONE << position;
 				occupied |= ONE << position;
 				switch (s)
 				{
-					case 'p':
-						blackPawns |= ONE << position;
+					case 'K':
+						pieceBoards[1][1] |= ONE << position;
 						break;
-					case 'b':
-						blackBishops |= ONE << position;
+					case 'P':
+						pieceBoards[1][2] |= ONE << position;
 						break;
-					case 'n':
-						blackKnights |= ONE << position;
+					case 'N':
+						pieceBoards[1][3] |= ONE << position;
 						break;
-					case 'r':
-						blackRooks |= ONE << position;
+					case 'B':
+						pieceBoards[1][4] |= ONE << position;
 						break;
-					case 'q':
-						blackQueens |= ONE << position;
+					case 'R':
+						pieceBoards[1][5] |= ONE << position;
 						break;
-					case 'k':
-						blackKings |= ONE << position;
+					case 'Q':
+						pieceBoards[1][6] |= ONE << position;
 						break;
 				}
-
 			}
 		}
 	}

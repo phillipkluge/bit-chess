@@ -1,0 +1,8 @@
+make: Entering directory `/Users/phillipkluge/dev/bit-chess'
+g++ -c board.cpp
+g++ -c engine.cpp
+g++ -c moves.cpp
+g++ -c main.cpp
+g++ main.o board.o engine.o moves.o -o main
+make: Leaving directory `/Users/phillipkluge/dev/bit-chess'
+ 
